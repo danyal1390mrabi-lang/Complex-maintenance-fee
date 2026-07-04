@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شارژ ساختمان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F4F1E8;
+    --paper-line:#DAD4C2;
+    --ink:#233B52;
+    --ink-soft:#5C7288;
+    --ink-faint:#93A5B5;
+    --card:#FFFFFF;
+    --ok:#3F7A57;
+    --ok-bg:#E4F0E7;
+    --pending:#B4552F;
+    --pending-bg:#F6E6DC;
+    --accent:#C98A2C;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(35,59,82,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Vazirmatn', sans-serif;
+    background:var(--paper);
+    background-image:
+      linear-gradient(var(--paper-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+    background-size:28px 28px;
+    color:var(--ink);
+    min-height:100vh;
+    padding:0 0 60px;
+    direction:rtl;
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:28px 18px 0;}
+  header{text-align:center;margin-bottom:22px;}
+  .roof{
+    width:0;height:0;margin:0 auto 6px;
+    border-left:70px solid transparent;
+    border-right:70px solid transparent;
+    border-bottom:38px solid var(--ink);
+  }
+  header h1{
+    font-size:24px;font-weight:700;margin:0 0 4px;letter-spacing:0.5px;
+  }
+  header p{margin:0;color:var(--ink-soft);font-size:13px;}
+
+  .month-bar{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    margin:18px 0 24px;flex-wrap:wrap;
+  }
+  .month-bar label{font-size:13px;color:var(--ink-soft);}
+  .month-bar input, .month-bar select{
+    font-family:inherit;font-size:14px;padding:8px 12px;
+    border:1px solid var(--paper-line);border-radius:var(--radius);
+    background:var(--card);color:var(--ink);min-width:150px;
+  }
+  .month-bar button{
+    font-family:inherit;font-size:13px;padding:8px 14px;
+    border:1px solid var(--ink);border-radius:var(--radius);
+    background:var(--ink);color:var(--paper);cursor:pointer;
+  }
+  .month-bar button:active{transform:scale(0.97);}
+
+  .summary{
+    display:flex;gap:10px;margin-bottom:24px;
+  }
+  .summary .stat{
+    flex:1;background:var(--card);border:1px solid var(--paper-line);
+    border-radius:12px;padding:12px 14px;text-align:center;box-shadow:var(--shadow);
+  }
+  .summary .stat .n{font-size:20px;font-weight:700;}
+  .summary .stat .l{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+
+  .building{
+    border-right:3px solid var(--ink);
+    padding-right:14px;
+  }
+  .floor{
+    position:relative;margin-bottom:22px;
+  }
+  .floor-tag{
+    position:absolute;right:-14px;top:8px;
+    width:11px;height:11px;border-radius:50%;
+    background:var(--ink);border:2px solid var(--paper);
+  }
+  .floor-label{
+    font-size:12px;color:var(--ink-soft);margin:0 0 8px;
+    display:flex;align-items:center;gap:6px;
+  }
+  .floor-label .dash{flex:1;height:1px;background:var(--paper-line);}
+  .units{display:flex;gap:12px;}
+  .unit{
+    flex:1;background:var(--card);border:1px solid var(--paper-line);
+    border-radius:12px;padding:14px;box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:8px;
+    border-top:4px solid var(--ink-faint);
+    transition:border-color .2s;
+  }
+  .unit.paid{border-top-color:var(--ok);}
+  .unit.pending{border-top-color:var(--pending);}
+
+  .unit-head{display:flex;justify-content:space-between;align-items:center;}
+  .unit-no{font-size:13px;font-weight:600;color:var(--ink);}
+  .status-pill{
+    font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;
+    white-space:nowrap;
+  }
+  .status-pill.paid{background:var(--ok-bg);color:var(--ok);}
+  .status-pill.pending{background:var(--pending-bg);color:var(--pending);}
+
+  .unit .owner-name{
+    font-size:13px;font-weight:500;color:var(--ink);
+  }
+  .unit .charge-amount{
+    font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:6px;
+  }
+  .unit .charge-amount b{color:var(--ink);font-weight:600;}
+
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-top:2px;}
+  .toggle-row .lbl{font-size:12px;color:var(--ink-soft);}
+  .switch{
+    position:relative;width:42px;height:24px;border-radius:20px;
+    background:var(--pending-bg);border:1px solid var(--pending);cursor:pointer;
+    flex-shrink:0;transition:background .2s,border-color .2s;
+  }
+  .switch.on{background:var(--ok-bg);border-color:var(--ok);}
+  .switch .knob{
+    position:absolute;top:1px;right:2px;width:18px;height:18px;border-radius:50%;
+    background:var(--pending);transition:right .2s,background .2s;
+  }
+  .switch.on .knob{right:20px;background:var(--ok);}
+
+  .save-hint{font-size:10px;color:var(--ink-faint);text-align:center;margin-top:2px;height:12px;}
+  .foot-note{
+    text-align:center;font-size:11px;color:var(--ink-faint);margin-top:26px;
+  }
+  @media (max-width:420px){
+    .units{flex-direction:column;}
+    .roof{border-left-width:50px;border-right-width:50px;border-bottom-width:28px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="roof"></div>
+    <h1 id="buildingTitle">شارژ ساختمان</h1>
+    <p>پیگیری پرداخت شارژ هر واحد به تفکیک طبقه</p>
+  </header>
+
+  <div class="month-bar">
+    <label for="monthInput">ماه:</label>
+    <input id="monthInput" type="text" placeholder="مثلاً تیر ۱۴۰۴" />
+    <button id="loadBtn">نمایش این ماه</button>
+  </div>
+  <div style="text-align:center;margin-bottom:8px;">
+    <button id="resetBtn" style="font-family:inherit;font-size:12px;padding:6px 12px;border:1px solid var(--pending);border-radius:var(--radius);background:var(--pending-bg);color:var(--pending);cursor:pointer;">پاک کردن وضعیت پرداخت این ماه</button>
+  </div>
+
+  <div class="summary" id="summary"></div>
+
+  <div class="building" id="building"></div>
+
+  <p class="foot-note">اسم صاحب واحد و مبلغ شارژ فقط از داخل کد قابل تغییرند. وضعیت پرداخت هر ماه برای همه‌ی کسانی که به این برنامه دسترسی دارند مشترک است.</p>
+</div>
+
+<script>
+/* ================================================================
+   بخش تنظیمات — همین‌جا مستقیم در کد تغییر بده:
+   - BUILDING_NAME: اسم ساختمان
+   - FLOORS: شماره طبقات (از بالا به پایین)
+   - UNITS_PER_FLOOR: تعداد و چیدمان واحدها در هر طبقه (راست، چپ)
+   - DEFAULT_UNIT_DATA: اسم صاحب و مبلغ شارژ هر واحد. کلید هر واحد از
+     شماره طبقه + شماره واحد ساخته می‌شود، مثلاً واحد ۱ طبقه ۴ = "401"
+   نکته: اسم و مبلغ فقط از همین‌جا تغییر می‌کنند و در خود اپ قابل
+   ویرایش نیستند. تنها چیزی که در اپ تغییر می‌کند وضعیت "پرداخت شده /
+   پرداخت نشده" در هر ماه است.
+================================================================ */
+const BUILDING_NAME = "شارژ ساختمان";
+
+const FLOORS = [4,3,2,1];
+const UNITS_PER_FLOOR = ["۲","۱"]; // ترتیب راست به چپ
+
+const DEFAULT_UNIT_DATA = {
+  "401": { name:"", amount:"" },
+  "402": { name:"", amount:"" },
+  "301": { name:"", amount:"" },
+  "302": { name:"", amount:"" },
+  "201": { name:"", amount:"" },
+  "202": { name:"", amount:"" },
+  "101": { name:"", amount:"" },
+  "102": { name:"", amount:"" }
+};
+/* ================================================================ */
+
+function unitId(floor, idx){ return floor + "0" + (idx+1); }
+function defaultMonthLabel(){
+  const now = new Date();
+  const persianMonths = ["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"];
+  try{
+    const fmt = new Intl.DateTimeFormat('fa-IR-u-ca-persian', {month:'long', year:'numeric'});
+    return fmt.format(now);
+  }catch(e){
+    return persianMonths[now.getMonth()] + " " + now.getFullYear();
+  }
+}
+
+let currentMonth = defaultMonthLabel();
+let currentPaid = {}; // { unitId: true/false } for the loaded month
+
+function unitInfo(id){
+  const d = DEFAULT_UNIT_DATA[id];
+  return d ? { name:d.name||"", amount:d.amount||"" } : { name:"", amount:"" };
+}
+
+function buildingKey(month){ return "paid-status:" + month; }
+
+async function loadMonth(month){
+  currentMonth = month;
+  document.getElementById('monthInput').value = month;
+  let data = {};
+  try{
+    const res = await window.storage.get(buildingKey(month), true);
+    if(res && res.value){
+      data = JSON.parse(res.value);
+    }
+  }catch(e){
+    data = {};
+  }
+  FLOORS.forEach(f=>{
+    UNITS_PER_FLOOR.forEach((_,i)=>{
+      const id = unitId(f,i);
+      if(typeof data[id] !== 'boolean') data[id] = false;
+    });
+  });
+  currentPaid = data;
+  render();
+  rememberMonth(month);
+}
+
+async function rememberMonth(month){
+  try{
+    let list = [];
+    try{
+      const res = await window.storage.get("months-list", true);
+      if(res && res.value) list = JSON.parse(res.value);
+    }catch(e){ list = []; }
+    if(!list.includes(month)){
+      list.push(month);
+      await window.storage.set("months-list", JSON.stringify(list), true);
+    }
+  }catch(e){}
+}
+
+async function persist(){
+  try{
+    await window.storage.set(buildingKey(currentMonth), JSON.stringify(currentPaid), true);
+  }catch(e){
+    console.error("storage error", e);
+  }
+}
+
+function fmtToman(v){
+  const n = parseInt(String(v).replace(/[^0-9]/g,''),10);
+  if(isNaN(n)) return "";
+  return n.toLocaleString('en-US');
+}
+
+function renderSummary(){
+  const ids = Object.keys(currentPaid);
+  const total = ids.length;
+  let paidCount = 0, sumPaid = 0, sumAll = 0;
+  ids.forEach(id=>{
+    const amt = parseInt(String(unitInfo(id).amount).replace(/[^0-9]/g,''),10) || 0;
+    sumAll += amt;
+    if(currentPaid[id]){ paidCount++; sumPaid += amt; }
+  });
+  const el = document.getElementById('summary');
+  el.innerHTML = `
+    <div class="stat"><div class="n">${paidCount} از ${total}</div><div class="l">واحدهای پرداخت‌شده</div></div>
+    <div class="stat"><div class="n">${fmtToman(sumPaid)}</div><div class="l">جمع دریافتی (تومان)</div></div>
+    <div class="stat"><div class="n">${fmtToman(sumAll - sumPaid)}</div><div class="l">مانده (تومان)</div></div>
+  `;
+}
+
+function render(){
+  const container = document.getElementById('building');
+  container.innerHTML = "";
+  FLOORS.forEach(f=>{
+    const floorDiv = document.createElement('div');
+    floorDiv.className = 'floor';
+
+    const tag = document.createElement('div');
+    tag.className = 'floor-tag';
+    floorDiv.appendChild(tag);
+
+    const label = document.createElement('div');
+    label.className = 'floor-label';
+    label.innerHTML = `<span>طبقه ${f}</span><span class="dash"></span>`;
+    floorDiv.appendChild(label);
+
+    const unitsDiv = document.createElement('div');
+    unitsDiv.className = 'units';
+
+    UNITS_PER_FLOOR.forEach((_,i)=>{
+      const id = unitId(f,i);
+      const info = unitInfo(id);
+      const paid = !!currentPaid[id];
+      const card = document.createElement('div');
+      card.className = 'unit ' + (paid ? 'paid' : 'pending');
+
+      card.innerHTML = `
+        <div class="unit-head">
+          <span class="unit-no">واحد ${id}</span>
+          <span class="status-pill ${paid ? 'paid' : 'pending'}">${paid ? 'پرداخت شده' : 'پرداخت نشده'}</span>
+        </div>
+        <div class="owner-name">${info.name ? info.name.replace(/</g,'&lt;') : '<span style="color:var(--ink-faint);">نام صاحب واحد وارد نشده</span>'}</div>
+        <div class="charge-amount">مبلغ شارژ: <b>${info.amount ? fmtToman(info.amount) + ' تومان' : '—'}</b></div>
+        <div class="toggle-row">
+          <span class="lbl">وضعیت پرداخت</span>
+          <div class="switch ${paid ? 'on' : ''}" data-id="${id}"></div>
+        </div>
+        <div class="save-hint" data-hint="${id}"></div>
+      `;
+
+      const switchEl = card.querySelector('.switch');
+      switchEl.addEventListener('click', ()=>{
+        currentPaid[id] = !currentPaid[id];
+        card.className = 'unit ' + (currentPaid[id] ? 'paid' : 'pending');
+        card.querySelector('.status-pill').textContent = currentPaid[id] ? 'پرداخت شده' : 'پرداخت نشده';
+        card.querySelector('.status-pill').className = 'status-pill ' + (currentPaid[id] ? 'paid' : 'pending');
+        switchEl.classList.toggle('on', currentPaid[id]);
+        saveAndFlash(id, card);
+        renderSummary();
+      });
+
+      unitsDiv.appendChild(card);
+    });
+
+    floorDiv.appendChild(unitsDiv);
+    container.appendChild(floorDiv);
+  });
+  renderSummary();
+}
+
+async function saveAndFlash(id, card){
+  await persist();
+  const hint = card.querySelector('.save-hint');
+  hint.textContent = 'ذخیره شد';
+  setTimeout(()=>{ if(hint) hint.textContent = ''; }, 1400);
+}
+
+document.getElementById('loadBtn').addEventListener('click', ()=>{
+  const val = document.getElementById('monthInput').value.trim();
+  if(val) loadMonth(val);
+});
+
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  const fresh = {};
+  FLOORS.forEach(f=>{
+    UNITS_PER_FLOOR.forEach((_,i)=>{
+      const id = unitId(f,i);
+      fresh[id] = false;
+    });
+  });
+  currentPaid = fresh;
+  await persist();
+  render();
+});
+
+document.getElementById('buildingTitle').textContent = BUILDING_NAME;
+loadMonth(currentMonth);
+</script>
+</body>
+</html>
